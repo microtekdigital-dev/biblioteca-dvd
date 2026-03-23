@@ -6,7 +6,7 @@ import './globals.css'
 const geist = Geist({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Mi Colección DVD',
+  title: 'Biblioteca de DVDs',
   description: 'Gestiona tu colección de películas en DVD, Blu-ray y 4K',
   icons: {
     icon: [

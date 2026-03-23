@@ -21,7 +21,7 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur px-4 py-3">
         <div className="mx-auto flex max-w-screen-2xl items-center justify-between">
-          <h1 className="text-base font-bold sm:text-lg">📀 Mi colección</h1>
+          <h1 className="text-base font-bold sm:text-lg">📀 Biblioteca de DVDs</h1>
           <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1.5">
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Salir</span>
