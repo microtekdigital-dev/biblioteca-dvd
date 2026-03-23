@@ -56,6 +56,10 @@ function groupByGenero(dvds: Dvd[]): { genero: string; items: Dvd[] }[] {
     .map(([genero, items]) => ({ genero, items }))
 }
 
+function generoId(genero: string) {
+  return 'genero-' + genero.toLowerCase().replace(/[^a-z0-9]/g, '-')
+}
+
 interface GeneroRowProps {
   genero: string
   items: Dvd[]
@@ -73,7 +77,7 @@ function GeneroRow({ genero, items, total, onEdit, onDelete }: GeneroRowProps) {
   }
 
   return (
-    <div className="space-y-2">
+    <div id={generoId(genero)} className="space-y-2 scroll-mt-20">
       <h2 className="text-sm font-semibold tracking-wide text-foreground/90 sm:text-base">
         {genero}
         <span className="ml-2 text-xs font-normal text-muted-foreground">({items.length})</span>
@@ -136,6 +140,22 @@ export function CatalogView() {
 
   const filtered = filterDvds(dvds, search)
   const sections = groupByGenero(filtered)
+
+  // Estadísticas globales (sobre todos los DVDs, no los filtrados)
+  const totalPeliculas = dvds.length
+  const generoStats = (() => {
+    const map = new Map<string, number>()
+    for (const dvd of dvds) {
+      const genres = dvd.genero
+        ? dvd.genero.split(',').map((g) => g.trim()).filter(Boolean)
+        : []
+      for (const g of genres) {
+        map.set(g, (map.get(g) ?? 0) + 1)
+      }
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+  })()
 
   // Últimas agregadas: ordenadas por fecha_agregado o created_at desc, top 20
   const ultimasAgregadas = [...dvds]
@@ -213,6 +233,36 @@ export function CatalogView() {
 
   return (
     <div className="space-y-6">
+      {/* Estadísticas */}
+      {totalPeliculas > 0 && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-border bg-muted/40 px-4 py-2 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">
+            📀 {totalPeliculas} {totalPeliculas === 1 ? 'película' : 'películas'}
+          </span>
+          {generoStats.length > 0 && (
+            <>
+              <span className="hidden sm:inline text-border">|</span>
+              <div className="flex flex-wrap gap-x-3 gap-y-1">
+                {generoStats.map(([genero, count]) => (
+                  <button
+                    key={genero}
+                    onClick={() => {
+                      setSearch('')
+                      setTimeout(() => {
+                        document.getElementById(generoId(genero))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }, 50)
+                    }}
+                    className="hover:text-foreground hover:underline transition-colors cursor-pointer"
+                  >
+                    {genero} <span className="text-xs">({count})</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Barra de herramientas */}
       <div className="flex items-center gap-2">
         <Input
